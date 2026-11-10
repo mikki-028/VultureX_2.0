@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BookOpen, CalendarClock, Home, LayoutGrid, User } from "lucide-react";
+import type { MessageKey } from "@/features/i18n/messages";
+import { useLanguage } from "@/components/shared/LanguageProvider";
 
-const ITEMS = [
-  { label: "Home", href: "/knowledge-hub/for-you", icon: Home },
-  { label: "Learn", href: "/knowledge-hub/start-business", icon: BookOpen },
-  { label: "Opportunities", href: "/knowledge-hub/funding", icon: CalendarClock },
-  { label: "Hub", href: "/knowledge-hub", icon: LayoutGrid },
-  { label: "Profile", href: "/settings", icon: User },
+const ITEMS: { key: MessageKey; href: string; icon: typeof Home }[] = [
+  { key: "foryou.bottomHome", href: "/knowledge-hub/for-you", icon: Home },
+  { key: "foryou.bottomLearn", href: "/knowledge-hub/start-business", icon: BookOpen },
+  { key: "foryou.bottomOpportunities", href: "/knowledge-hub/funding", icon: CalendarClock },
+  { key: "foryou.bottomHub", href: "/knowledge-hub", icon: LayoutGrid },
+  { key: "foryou.bottomProfile", href: "/settings", icon: User },
 ];
 
 /**
@@ -18,10 +20,11 @@ const ITEMS = [
  */
 export function ForYouBottomNav() {
   const pathname = usePathname() ?? "";
+  const { t } = useLanguage();
 
   return (
     <nav
-      aria-label="Founder quick navigation"
+      aria-label={t("foryou.quickNav")}
       className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--border)] bg-[var(--bg)]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
       <ul className="grid grid-cols-5">
@@ -39,7 +42,7 @@ export function ForYouBottomNav() {
                 }`}
               >
                 <item.icon size={16} aria-hidden="true" />
-                {item.label}
+                {t(item.key)}
               </Link>
             </li>
           );

@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { pitchDeckEvents, pitchDeckRequests, type PitchDeckStatus } from "@/db/schema";
 import { requireAdmin } from "@/features/pitch-deck";
+import { notifyPitchDeckFounder } from "@/features/pitch-deck/notify";
 import { isUuid } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -34,6 +35,13 @@ export async function POST(
     .where(eq(pitchDeckRequests.id, id))
     .limit(1);
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  if (record.status === "rejected" && body.status) {
+    return NextResponse.json(
+      { error: "This request was rejected. The founder must reopen it before its status changes." },
+      { status: 409 },
+    );
+  }
 
   const patch: Partial<typeof pitchDeckRequests.$inferInsert> = { updatedAt: new Date() };
 
@@ -68,6 +76,14 @@ export async function POST(
     message: body.note?.trim()
       ? `Admin: ${body.note.trim().slice(0, 200)}`
       : `Status set to ${updated.status}`,
+  });
+
+  await notifyPitchDeckFounder({
+    recipientUserId: record.userId,
+    actorUserId: admin.userId,
+    body: body.note?.trim()
+      ? `Your pitch deck request was updated: ${body.note.trim().slice(0, 200)}`
+      : `Your pitch deck request is now ${updated.status.replace(/_/g, " ")}.`,
   });
 
   return NextResponse.json({ request: updated });

@@ -19,7 +19,12 @@ type NotificationItem = {
     | "competition_application_status"
     | "competition_winner_proposed"
     | "competition_winner_announced"
-    | "reminder_due";
+    | "reminder_due"
+    | "pitch_deck_submitted"
+    | "pitch_deck_status"
+    | "pitch_deck_published"
+    | "impact_submitted"
+    | "impact_review";
   body: string | null;
   createdAt: string;
   readAt: string | null;

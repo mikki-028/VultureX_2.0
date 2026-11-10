@@ -17,6 +17,10 @@ const STYLES: Record<PitchDeckStatus, { label: string; className: string }> = {
     label: "Pitch Deck In Progress",
     className: "bg-[var(--accent-muted)] text-[var(--accent)] border-[var(--accent)]/30",
   },
+  rejected: {
+    label: "Changes required",
+    className: "bg-[var(--red-muted)] text-[var(--red)] border-[var(--red)]/30",
+  },
   completed: {
     label: "Completed",
     className: "bg-[var(--green-muted)] text-[var(--green)] border-[var(--green)]/30",

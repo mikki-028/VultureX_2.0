@@ -15,15 +15,19 @@ export const metadata: Metadata = {
  */
 const themeScript = `(function(){try{var saved=localStorage.getItem("vx-theme");var theme=saved==="light"||saved==="dark"?saved:"dark";var root=document.documentElement;root.classList.toggle("dark",theme==="dark");root.style.colorScheme=theme;}catch(e){document.documentElement.classList.add("dark");}})();`;
 
+/** Applies the saved/connection-derived low-bandwidth flag before first paint. */
+const dataSaverScript = `(function(){try{var saved=localStorage.getItem("vx-lite");var connection=navigator.connection||navigator.mozConnection||navigator.webkitConnection;var enabled=saved==="true"||(saved!=="false"&&!!(connection&&connection.saveData));document.documentElement.dataset.saver=enabled?"true":"false";}catch(e){document.documentElement.dataset.saver="false";}})();`;
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" data-saver="false" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: dataSaverScript }} />
       </head>
       <body className="min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased">
         <Providers>{children}</Providers>

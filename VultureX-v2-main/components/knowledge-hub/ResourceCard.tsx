@@ -11,6 +11,7 @@ export function ResourceCard({
   href,
   icon,
   resourceKey,
+  readLabel = "Read topic",
 }: {
   title: string;
   description: string;
@@ -18,6 +19,7 @@ export function ResourceCard({
   href: string;
   icon: HubIconKey;
   resourceKey?: string;
+  readLabel?: string;
 }) {
   return (
     <article className="group vx-card vx-card-interactive flex h-full flex-col justify-between gap-4 p-4">
@@ -40,7 +42,7 @@ export function ResourceCard({
         href={href}
         className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
       >
-        Read topic
+        {readLabel}
         <ArrowRight
           size={11}
           className="transition-transform group-hover:translate-x-0.5"

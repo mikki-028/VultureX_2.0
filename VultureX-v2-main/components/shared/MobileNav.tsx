@@ -26,9 +26,13 @@ import {
   Users,
   X,
 } from "lucide-react";
+import type { MessageKey } from "@/features/i18n/messages";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
 import { useUnreadBadges } from "./use-unread-badges";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import { LiteModeToggle } from "./LiteModeToggle";
+import { useLanguage } from "./LanguageProvider";
 
 type Role = "startup" | "investor" | "admin";
 
@@ -36,49 +40,51 @@ export function MobileNav({ role }: { role: Role }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const badges = useUnreadBadges(role !== "admin");
+  const { t } = useLanguage();
 
-  const items: { label: string; href: string; icon: typeof Heart; count?: number }[] =
+  const items = (
     role === "admin"
       ? [
-          { label: "Pitch Deck Requests", href: "/admin/pitch-decks", icon: Presentation },
-          { label: "Impact Review", href: "/admin/impact", icon: ShieldCheck },
-          { label: "Competitions", href: "/admin/competitions", icon: Trophy },
-          { label: "Explore", href: "/explore", icon: Search },
-          { label: "Knowledge Hub", href: "/knowledge-hub", icon: BookOpen },
-          { label: "Settings", href: "/settings", icon: Settings },
+          { key: "nav.pitchDecks", href: "/admin/pitch-decks", icon: Presentation },
+          { key: "nav.impactReview", href: "/admin/impact", icon: ShieldCheck },
+          { key: "nav.competitions", href: "/admin/competitions", icon: Trophy },
+          { key: "nav.explore", href: "/explore", icon: Search },
+          { key: "nav.knowledgeHub", href: "/knowledge-hub", icon: BookOpen },
+          { key: "nav.settings", href: "/settings", icon: Settings },
         ]
       : [
-          { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+          { key: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard },
           ...(role === "startup"
             ? [
-                { label: "For You", href: "/knowledge-hub/for-you", icon: Sparkles },
+                { key: "nav.forYou", href: "/knowledge-hub/for-you", icon: Sparkles },
                 {
-                  label: "Founder Profile",
+                  key: "nav.founderProfile",
                   href: "/knowledge-hub/for-you/profile",
                   icon: UserRound,
                 },
-                { label: "Roadmap", href: "/knowledge-hub/roadmap", icon: ListChecks },
+                { key: "nav.roadmap", href: "/knowledge-hub/roadmap", icon: ListChecks },
                 {
-                  label: "Saved Resources",
+                  key: "nav.savedResources",
                   href: "/knowledge-hub/for-you/saved",
                   icon: Bookmark,
                 },
                 {
-                  label: "Reminders",
+                  key: "nav.reminders",
                   href: "/knowledge-hub/for-you/reminders",
                   icon: CalendarClock,
                 },
-                { label: "Discover", href: "/discover", icon: Compass },
+                { key: "nav.discover", href: "/discover", icon: Compass },
               ]
             : []),
-          { label: "Explore", href: "/explore", icon: Search },
-          { label: "Knowledge Hub", href: "/knowledge-hub", icon: BookOpen },
-          { label: "Competitions", href: "/competitions", icon: Trophy },
-          { label: "Investors", href: "/investors", icon: Users },
-          { label: "Interests", href: "/interests", icon: Heart, count: badges.pendingRequests },
-          { label: "Messages", href: "/messages", icon: MessageSquare, count: badges.messages },
-          { label: "Settings", href: "/settings", icon: Settings },
-        ];
+          { key: "nav.explore", href: "/explore", icon: Search },
+          { key: "nav.knowledgeHub", href: "/knowledge-hub", icon: BookOpen },
+          { key: "nav.competitions", href: "/competitions", icon: Trophy },
+          { key: "nav.investors", href: "/investors", icon: Users },
+          { key: "nav.interests", href: "/interests", icon: Heart, count: badges.pendingRequests },
+          { key: "nav.messages", href: "/messages", icon: MessageSquare, count: badges.messages },
+          { key: "nav.settings", href: "/settings", icon: Settings },
+        ]
+  ) as { key: MessageKey; href: string; icon: typeof Heart; count?: number }[];
 
   return (
     <header className="md:hidden sticky top-0 z-50 bg-[var(--bg)]/95 backdrop-blur border-b border-[var(--border)]">
@@ -96,7 +102,7 @@ export function MobileNav({ role }: { role: Role }) {
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
-            aria-label="Toggle navigation"
+            aria-label={t("nav.toggle")}
             aria-expanded={open}
             className="p-1.5 rounded-md text-[var(--text-muted)] hover:text-[var(--text)] hover:bg-[var(--bg-elevated)] transition-colors"
           >
@@ -123,7 +129,7 @@ export function MobileNav({ role }: { role: Role }) {
                 }`}
               >
                 <item.icon size={14} />
-                <span className="flex-1">{item.label}</span>
+                <span className="flex-1">{t(item.key)}</span>
                 {!!item.count && item.count > 0 && (
                   <span className="min-w-[16px] h-[16px] px-1 rounded-full bg-[var(--accent-fill)] text-[var(--accent-foreground)] text-[9px] font-bold flex items-center justify-center tabular-nums">
                     {item.count > 9 ? "9+" : item.count}
@@ -134,13 +140,15 @@ export function MobileNav({ role }: { role: Role }) {
           })}
 
           <div className="mt-1 pt-2 border-t border-[var(--border)] space-y-0.5">
+            {role === "startup" && <LanguageSwitcher />}
+            <LiteModeToggle />
             <Link
               href="/"
               onClick={() => setOpen(false)}
               className="flex items-center gap-2.5 px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] rounded-md transition-colors"
             >
               <Home size={14} />
-              VultureX home
+              {t("nav.home")}
             </Link>
             <button
               type="button"
@@ -148,7 +156,7 @@ export function MobileNav({ role }: { role: Role }) {
               className="flex w-full items-center gap-2.5 px-3 py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] rounded-md transition-colors"
             >
               <LogOut size={14} />
-              Sign out
+              {t("nav.signOut")}
             </button>
           </div>
         </nav>

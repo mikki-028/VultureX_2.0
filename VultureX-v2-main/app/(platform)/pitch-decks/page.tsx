@@ -129,6 +129,14 @@ export default async function PitchDecksPage() {
                           Review &amp; approve summary
                         </Link>
                       )}
+                      {request.status === "rejected" && (
+                        <Link
+                          href={`/pitch-decks/${request.id}`}
+                          className="px-3 py-1.5 text-[11px] font-medium border border-[var(--red)]/40 text-[var(--red)] rounded-md hover:bg-[var(--red-muted)] transition-colors"
+                        >
+                          Review required changes
+                        </Link>
+                      )}
                       {(request.status === "approved" || request.status === "in_progress") && (
                         <Link
                           href={`/pitch-decks/${request.id}/summary`}

@@ -12,6 +12,7 @@ import {
   type BatchNumber,
   type DeckSummary,
 } from "@/features/pitch-deck";
+import { notifyPitchDeckAdmins } from "@/features/pitch-deck/notify";
 
 type Body = {
   action?: "save_batch" | "submit" | "save_summary" | "approve" | "revise";
@@ -133,6 +134,11 @@ export async function PATCH(
       message: "Questionnaire submitted — summary ready for review",
     });
 
+    await notifyPitchDeckAdmins({
+      actorUserId: actor.userId,
+      body: `${startup.name} submitted "${record.title}" for pitch deck review.`,
+    });
+
     return NextResponse.json({ request: updated });
   }
 
@@ -198,6 +204,11 @@ export async function PATCH(
       actorRole: "startup",
       type: "approved",
       message: `Summary approved by ${actor.email ?? "founder"}`,
+    });
+
+    await notifyPitchDeckAdmins({
+      actorUserId: actor.userId,
+      body: `${startup.name} approved the summary for "${record.title}". The deck can now be prepared.`,
     });
 
     return NextResponse.json({ request: updated });

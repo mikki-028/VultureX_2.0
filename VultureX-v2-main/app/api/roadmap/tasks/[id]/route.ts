@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  deleteCustomTask,
   normalizeUpdateTaskInput,
   RoadmapValidationError,
   updateTask,
@@ -9,6 +10,37 @@ import { roadmapRequestContext } from "@/features/roadmap/request";
 import { isUuid } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const context = await roadmapRequestContext();
+  if ("error" in context) return context.error;
+
+  const { id } = await params;
+  if (!isUuid(id)) {
+    return NextResponse.json({ error: "Invalid task id" }, { status: 400 });
+  }
+
+  try {
+    const result = await deleteCustomTask(context.userId, id);
+    if (result === "not_found") {
+      return NextResponse.json({ error: "Task not found" }, { status: 404 });
+    }
+    if (result === "template") {
+      return NextResponse.json(
+        { error: "Suggested stage tasks cannot be deleted; mark one skipped instead." },
+        { status: 409 }
+      );
+    }
+    revalidateRoadmap();
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Failed to delete roadmap task:", error);
+    return NextResponse.json({ error: "Failed to delete task" }, { status: 500 });
+  }
+}
 
 export async function PATCH(
   request: Request,

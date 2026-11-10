@@ -6,6 +6,8 @@ import {
   startups,
   startupImpactClaims,
   impactVerificationEvents,
+  notifications,
+  users,
 } from "@/db/schema";
 import { normalizeSdgPrimary, sanitizeSdgIds } from "@/features/sdg/taxonomy";
 import {
@@ -159,6 +161,23 @@ export async function POST(request: Request) {
           ? "Claim resubmitted after the profile changed."
           : null,
     });
+
+    try {
+      const admins = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.role, "admin"));
+      for (const admin of admins) {
+        await db.insert(notifications).values({
+          recipientUserId: admin.id,
+          actorUserId: session.user.id,
+          type: "impact_submitted",
+          body: `${startup.name} submitted an SDG impact claim for review.`,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to notify admins about impact claim:", error);
+    }
 
     return NextResponse.json({ claim, status: claim.status });
   } catch (error) {

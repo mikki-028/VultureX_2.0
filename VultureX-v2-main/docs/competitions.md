@@ -110,10 +110,13 @@ project URL. The publishable key in `.env` is not used by this data layer.
 
 ## Notifications
 
-Publication notifies every startup with a profile (title, host, theme, deadline
-and prize in the body, deep link to the competition). Investors are notified of
-applications, review decisions and winner publication; applicants are notified
-of status changes; admins are notified of new proposals and winner proposals.
+Publication notifies eligible startup profiles only. The fan-out runs each
+startup through the same `evaluateEligibility` rules used by the apply route
+(stage, sector, revenue, region, SDG and verified-impact requirements), so an
+ineligible or incomplete profile never receives a publication notification.
+Investors are notified of applications, review decisions and winner publication;
+applicants are notified of status changes; admins are notified of new proposals
+and winner proposals.
 All notifications reuse the existing bell and unread counters.
 
 ## Known limitations

@@ -2,17 +2,19 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { HubIcon } from "./icons";
 import { hubSectionHref, type HubSection } from "@/lib/knowledge-hub";
+import { translatorFor, type Locale } from "@/features/i18n/messages";
 
-export function SectionCard({ section, headingLevel = 3 }: { section: HubSection; headingLevel?: 3 | 4 }) {
+export function SectionCard({ section, headingLevel = 3, locale = "en" }: { section: HubSection; headingLevel?: 3 | 4; locale?: Locale }) {
+  const t = translatorFor(locale);
   const entryCount =
     section.topics.length ||
     (section.groups?.reduce((total, group) => total + group.items.length, 0) ?? 0);
 
   const meta =
     section.slug === "for-you"
-      ? "Personal workspace"
+      ? t("kh.personalWorkspace")
       : entryCount > 0
-        ? `${entryCount} ${section.groups?.length ? "entries" : "topics"}`
+        ? t(section.groups?.length ? "kh.entries" : "kh.topics", { count: entryCount })
         : section.eyebrow;
 
   const Heading = headingLevel === 3 ? "h3" : "h4";

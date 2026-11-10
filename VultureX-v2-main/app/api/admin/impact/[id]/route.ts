@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { auth } from "@/features/auth";
 import { db } from "@/db";
-import { startupImpactClaims, impactVerificationEvents } from "@/db/schema";
+import { startupImpactClaims, impactVerificationEvents, startups, notifications } from "@/db/schema";
 
 const ACTIONS = ["verified", "rejected", "changes_requested"] as const;
 type ReviewAction = (typeof ACTIONS)[number];
@@ -89,6 +89,24 @@ export async function POST(
 
     revalidatePath("/admin/impact");
     revalidatePath("/settings");
+
+    try {
+      const [startup] = await db
+        .select({ userId: startups.userId })
+        .from(startups)
+        .where(eq(startups.id, claim.startupId))
+        .limit(1);
+      if (startup?.userId) {
+        await db.insert(notifications).values({
+          recipientUserId: startup.userId,
+          actorUserId: session.user.id,
+          type: "impact_review",
+          body: `Your SDG impact claim was ${action.replace(/_/g, " ")}.${note ? ` Note: ${note}` : ""}`,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to notify founder about impact review:", error);
+    }
 
     return NextResponse.json({ claim: updated });
   } catch (error) {

@@ -236,3 +236,33 @@ select {
     scroll-behavior: auto !important;
   }
 }
+
+/*
+ * Low-bandwidth mode. `data-saver` is set before paint from the saved toggle or
+ * the browser's Save-Data hint. Core content remains; non-essential motion and
+ * decorative surfaces are removed and media is lazy by default.
+ */
+html[data-saver="true"] *,
+html[data-saver="true"] *::before,
+html[data-saver="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+html[data-saver="true"] .vx-decorative {
+  display: none !important;
+}
+html[data-saver="true"] .vx-card,
+html[data-saver="true"] .vx-inset {
+  box-shadow: none !important;
+}
+html[data-saver="true"] img {
+  content-visibility: auto;
+}
+
+@media (prefers-reduced-data: reduce) {
+  .vx-decorative {
+    display: none !important;
+  }
+}

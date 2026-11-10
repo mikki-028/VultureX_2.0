@@ -13,14 +13,18 @@ import {
   HUB_SECTION_MAP,
   type HubSection,
 } from "@/lib/knowledge-hub";
+import { getRequestLocale } from "@/features/i18n/server";
+import { translatorFor } from "@/features/i18n/messages";
 
 /**
  * One renderer for every Knowledge Hub destination. Each route supplies its own
  * slug, so the pages stay distinct URLs without duplicating layout or content.
  */
-export function HubSectionView({ slug }: { slug: string }) {
+export async function HubSectionView({ slug }: { slug: string }) {
   const section = getHubSection(slug);
   if (!section) notFound();
+  const locale = await getRequestLocale();
+  const t = translatorFor(locale);
 
   const related = section.related
     .map((relatedSlug) => HUB_SECTION_MAP.get(relatedSlug))
@@ -32,7 +36,7 @@ export function HubSectionView({ slug }: { slug: string }) {
     <div className="space-y-8">
       <div>
         <Breadcrumbs
-          items={[{ label: "Knowledge Hub", href: "/knowledge-hub" }, { label: section.title }]}
+          items={[{ label: t("nav.knowledgeHub"), href: "/knowledge-hub" }, { label: section.title }]}
         />
 
         <header>
@@ -70,7 +74,7 @@ export function HubSectionView({ slug }: { slug: string }) {
       {section.cta && (
         <div className="vx-card flex flex-wrap items-center justify-between gap-3 p-4">
           <div className="min-w-0">
-            <p className="vx-label">Next step</p>
+            <p className="vx-label">{t("kh.nextStep")}</p>
             <p className="mt-1 max-w-xl text-[11px] leading-relaxed text-[var(--text-secondary)]">
               {section.cta.hint}
             </p>
@@ -88,9 +92,9 @@ export function HubSectionView({ slug }: { slug: string }) {
       {section.topics.length > 0 && (
         <section aria-labelledby="topics-heading" className="space-y-3">
           <div>
-            <p className="vx-label">The path</p>
+            <p className="vx-label">{t("kh.path")}</p>
             <h2 id="topics-heading" className="mt-1 text-lg font-semibold tracking-tight">
-              {section.topics.length} topics to work through
+              {t("kh.topicCount", { count: section.topics.length })}
             </h2>
           </div>
 
@@ -125,9 +129,9 @@ export function HubSectionView({ slug }: { slug: string }) {
       {hasDirectory && section.groups && (
         <section aria-labelledby="directory-heading" className="space-y-3">
           <div>
-            <p className="vx-label">Directory</p>
+            <p className="vx-label">{t("kh.directory")}</p>
             <h2 id="directory-heading" className="mt-1 text-lg font-semibold tracking-tight">
-              Browse by area
+              {t("kh.browseArea")}
             </h2>
           </div>
 
@@ -150,7 +154,14 @@ export function HubSectionView({ slug }: { slug: string }) {
                     )}
                   </div>
                   <span className="vx-label">
-                    {group.items.length} {group.items.length === 1 ? "entry" : "entries"}
+                    {t("kh.entryCount", {
+                      count: group.items.length,
+                      unit: t(
+                        group.items.length === 1
+                          ? "kh.entryUnitOne"
+                          : "kh.entryUnitMany"
+                      ),
+                    })}
                   </span>
                 </div>
 
@@ -202,14 +213,14 @@ export function HubSectionView({ slug }: { slug: string }) {
       {related.length > 0 && (
         <section aria-labelledby="related-heading" className="space-y-3">
           <div>
-            <p className="vx-label">Cross-links</p>
+            <p className="vx-label">{t("kh.crossLinks")}</p>
             <h2 id="related-heading" className="mt-1 text-lg font-semibold tracking-tight">
-              Related in the Knowledge Hub
+              {t("kh.related")}
             </h2>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {related.map((relatedSection) => (
-              <SectionCard key={relatedSection.slug} section={relatedSection} />
+              <SectionCard key={relatedSection.slug} section={relatedSection} locale={locale} />
             ))}
           </div>
         </section>
@@ -220,7 +231,7 @@ export function HubSectionView({ slug }: { slug: string }) {
           href="/knowledge-hub"
           className="inline-flex items-center gap-1.5 text-[11px] font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--text)]"
         >
-          Back to the Knowledge Hub
+          {t("kh.back")}
           <ArrowRight size={11} aria-hidden="true" />
         </Link>
       </div>

@@ -57,7 +57,7 @@ export function RecommendationCard({
         <div className="w-9 h-9 rounded-lg bg-[var(--bg-elevated)] border border-[var(--border)] flex items-center justify-center text-xs font-semibold text-[var(--text-muted)] overflow-hidden shrink-0">
           {startup.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={startup.logoUrl} alt="" className="w-full h-full object-cover" />
+            <img src={startup.logoUrl} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
           ) : (
             startup.name.charAt(0).toUpperCase()
           )}

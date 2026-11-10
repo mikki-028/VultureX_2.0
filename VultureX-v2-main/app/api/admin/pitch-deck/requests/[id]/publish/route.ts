@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { pitchDeckEvents, pitchDeckFiles, pitchDeckRequests } from "@/db/schema";
 import { requireAdmin } from "@/features/pitch-deck";
+import { notifyPitchDeckFounder } from "@/features/pitch-deck/notify";
 import { isUuid } from "@/lib/utils";
 
 export const runtime = "nodejs";
@@ -32,6 +33,13 @@ export async function POST(
     .where(eq(pitchDeckRequests.id, id))
     .limit(1);
   if (!record) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  if (record.status === "rejected") {
+    return NextResponse.json(
+      { error: "This request was rejected. The founder must reopen it before publication." },
+      { status: 409 },
+    );
+  }
 
   // Only an approved summary may be turned into a published deck.
   if (!record.approvedSummary && record.status !== "in_progress" && record.status !== "completed") {
@@ -84,7 +92,14 @@ export async function POST(
     actorId: admin.userId,
     actorRole: "admin",
     type: "published",
-    message: `Published ${file.fileName} — now visible to the startup`,
+    message: `Published ${file.fileName} — now visible to the startup and investors`,
+  });
+
+  await notifyPitchDeckFounder({
+    recipientUserId: record.userId,
+    actorUserId: admin.userId,
+    type: "pitch_deck_published",
+    body: `Your pitch deck "${record.title}" is published and ready to download.`,
   });
 
   return NextResponse.json({ request: updated, fileId: file.id });

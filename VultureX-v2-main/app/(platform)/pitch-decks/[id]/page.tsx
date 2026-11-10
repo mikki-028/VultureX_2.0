@@ -67,6 +67,15 @@ export default async function PitchDeckRequestPage({
         />
       </div>
 
+      {request.status === "rejected" && (
+        <div className="mb-5 rounded-xl border border-[var(--red)]/30 bg-[var(--red-muted)] p-4">
+          <h2 className="text-xs font-semibold text-[var(--red)]">Changes required</h2>
+          <p className="mt-1 text-[11px] leading-relaxed text-[var(--red)]">
+            {request.adminNote ?? "The VultureX team asked for changes before this deck can be prepared."}
+          </p>
+        </div>
+      )}
+
       {/* Next action */}
       <div className="rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5 mb-5">
         <h2 className="text-xs font-medium text-[var(--text-muted)] mb-3">Next action</h2>
@@ -124,6 +133,19 @@ export default async function PitchDeckRequestPage({
                 <Download size={12} /> Download pitch deck
               </a>
             </div>
+          </div>
+        )}
+        {request.status === "rejected" && (
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="text-xs text-[var(--text-secondary)]">
+              Update the summary to address the feedback, then resubmit it for review.
+            </p>
+            <Link
+              href={`/pitch-decks/${request.id}/summary`}
+              className="px-4 py-2 text-xs font-medium bg-[var(--accent-fill)] text-[var(--accent-foreground)] rounded-md hover:bg-[var(--accent-hover)] transition-colors"
+            >
+              Reopen for corrections
+            </Link>
           </div>
         )}
         {request.status === "completed" && !published && (

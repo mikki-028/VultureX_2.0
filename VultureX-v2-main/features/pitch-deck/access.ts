@@ -93,13 +93,20 @@ export async function loadRequestForActor(
   return null;
 }
 
-/** A file is readable by its owning startup only when it is published. */
+/**
+ * A deck is readable by its owning startup after publication, and by any
+ * authenticated investor once published (the deck is the investor-facing
+ * artefact). Screenshots stay private to the owner and admins.
+ */
 export function canReadFile(
   file: typeof pitchDeckFiles.$inferSelect,
   actor: Actor,
   ownerUserId: string,
 ): boolean {
   if (actor.role === "admin") return true;
+  if (file.kind === "deck" && file.isPublished && actor.role === "investor") {
+    return true;
+  }
   if (actor.userId !== ownerUserId) return false;
   if (file.kind === "product_screenshot") return true;
   return file.isPublished;
@@ -110,5 +117,6 @@ export const STATUS_LABELS: Record<PitchDeckStatus, string> = {
   pending_approval: "Awaiting your approval",
   approved: "Approved — queued for our team",
   in_progress: "Pitch Deck In Progress",
+  rejected: "Changes required",
   completed: "Completed",
 };

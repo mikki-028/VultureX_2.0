@@ -15,6 +15,20 @@ export async function POST(request: Request) {
   try {
     const data = await request.json();
 
+    // Required by the schema, and an empty value would otherwise let a partial
+    // payload wipe the rest of an investor's saved profile.
+    if (
+      typeof data?.fullName !== "string" ||
+      !data.fullName.trim() ||
+      typeof data?.investorType !== "string" ||
+      !data.investorType.trim()
+    ) {
+      return NextResponse.json(
+        { error: "fullName and investorType are required" },
+        { status: 400 }
+      );
+    }
+
     const [existing] = await db
       .select()
       .from(investors)

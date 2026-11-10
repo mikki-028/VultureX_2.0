@@ -30,6 +30,8 @@ import {
 } from "@/components/knowledge-hub/founder";
 import { ForYouBottomNav } from "@/components/knowledge-hub/founder/ForYouBottomNav";
 import { getFounderProfile } from "@/features/founder-profile";
+import { getRequestLocale } from "@/features/i18n/server";
+import { translatorFor } from "@/features/i18n/messages";
 import { loadRoadmap } from "@/features/roadmap";
 import type { RoadmapOverview } from "@/features/roadmap/types";
 import { RoadmapSummary } from "@/components/knowledge-hub/roadmap/RoadmapSummary";
@@ -79,6 +81,8 @@ function readableStage(stage: string): string {
 
 export default async function ForYouPage() {
   const session = await auth();
+  const locale = await getRequestLocale();
+  const t = translatorFor(locale);
   const userId = session?.user?.id;
   const role = (session?.user as { role?: string } | undefined)?.role;
   const signedIn = Boolean(session?.user);
@@ -359,9 +363,9 @@ export default async function ForYouPage() {
         slug: startup.slug,
         actions: orderedActions,
         metrics: [
-          { label: "Profile views", value: views, hint: "last 30 days" },
-          { label: "Investor interests", value: interestTotal, hint: "all time" },
-          { label: "Pitch decks", value: deckTotal, hint: "stored" },
+          { label: t("foryou.profileViews"), value: views, hint: t("foryou.last30") },
+          { label: t("foryou.investorInterests"), value: interestTotal, hint: t("foryou.allTime") },
+          { label: t("foryou.pitchDecksStored"), value: deckTotal, hint: t("foryou.stored") },
         ],
         opportunities: opportunities.map((opportunity) => ({
           id: opportunity.id,
@@ -420,7 +424,7 @@ export default async function ForYouPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl pb-24 md:pb-0">
-      <FounderTopBar stage={founder?.stage ?? null} initial={initial} profileHref={profileHref} />
+      <FounderTopBar stage={founder?.stage ?? null} initial={initial} profileHref={profileHref} locale={locale} />
 
       <div className="space-y-4">
         <WelcomeCard
@@ -433,39 +437,40 @@ export default async function ForYouPage() {
           objective={founder?.objective ?? null}
           language={founder?.language ?? null}
           editProfileHref={founder ? "/knowledge-hub/for-you/profile" : null}
+          locale={locale}
         />
 
         {founder ? (
           <>
-            <FounderProgress stage={founder.stage} />
+            <FounderProgress stage={founder.stage} locale={locale} />
             {founder.roadmap && <RoadmapSummary roadmap={founder.roadmap} />}
-            <WorkspaceTools savedCount={founder.savedCount} reminders={founder.reminders} />
-            <NextActions actions={founder.actions} />
+            <WorkspaceTools savedCount={founder.savedCount} reminders={founder.reminders} locale={locale} />
+            <NextActions actions={founder.actions} locale={locale} />
 
             <div className="grid gap-4 md:grid-cols-2">
-              <LearningPanel items={[]} />
-              <MetricsPanel metrics={founder.metrics} />
+              <LearningPanel items={[]} locale={locale} />
+              <MetricsPanel metrics={founder.metrics} locale={locale} />
             </div>
 
-            <OpportunitiesPanel items={founder.opportunities} />
+            <OpportunitiesPanel items={founder.opportunities} locale={locale} />
 
             <div className="grid gap-4 md:grid-cols-2">
-              <CommunityPanel />
-              <AlertPanel />
+              <CommunityPanel locale={locale} />
+              <AlertPanel locale={locale} />
             </div>
 
-            <ImpactPanel goals={founder.goals} />
+            <ImpactPanel goals={founder.goals} locale={locale} />
           </>
         ) : (
           <>
             {accountPanel}
 
             <div className="grid gap-4 md:grid-cols-2">
-              <CommunityPanel />
-              <AlertPanel />
+              <CommunityPanel locale={locale} />
+              <AlertPanel locale={locale} />
             </div>
 
-            <ImpactPanel goals={[]} />
+            <ImpactPanel goals={[]} locale={locale} />
           </>
         )}
       </div>

@@ -572,12 +572,14 @@ export const deckViews = pgTable("deck_views", {
 // pending_approval     -> all batches submitted, founder reviewing/approving summary
 // approved             -> founder approved the summary, waiting for the admin team
 // in_progress          -> admin is preparing the deck (or has uploaded an unpublished draft)
+// rejected             -> admin declined the request; reason is in admin_note
 // completed            -> admin published the deck, founder can download it
 export const PITCH_DECK_STATUSES = [
   "incomplete",
   "pending_approval",
   "approved",
   "in_progress",
+  "rejected",
   "completed",
 ] as const;
 
@@ -836,6 +838,13 @@ export const NOTIFICATION_TYPES = [
   "competition_winner_announced",
   // In-app reminders reuse the existing notification bell and unread count.
   "reminder_due",
+  // Pitch deck request lifecycle.
+  "pitch_deck_submitted",
+  "pitch_deck_status",
+  "pitch_deck_published",
+  // SDG impact claim lifecycle.
+  "impact_submitted",
+  "impact_review",
 ] as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[number];

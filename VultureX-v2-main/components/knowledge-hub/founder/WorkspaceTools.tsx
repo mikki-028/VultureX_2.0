@@ -1,24 +1,28 @@
 import Link from "next/link";
 import { ArrowRight, Bookmark, CalendarClock } from "lucide-react";
 import type { ReminderSummary } from "@/features/reminders/types";
+import { translatorFor, type Locale } from "@/features/i18n/messages";
 
 export function WorkspaceTools({
   savedCount,
   reminders,
+  locale = "en",
 }: {
   savedCount: number;
   reminders: ReminderSummary;
+  locale?: Locale;
 }) {
+  const t = translatorFor(locale);
   const due = reminders.overdue + reminders.dueToday;
 
   return (
     <section aria-labelledby="workspace-tools-heading" className="vx-card p-5">
-      <p className="vx-label">Founder workspace</p>
+      <p className="vx-label">{t("foryou.workspace")}</p>
       <h2 id="workspace-tools-heading" className="mt-1 text-sm font-semibold tracking-tight">
-        Saved resources and reminders
+        {t("foryou.savedAndReminders")}
       </h2>
       <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-        Everything here is read from your own saved items and reminders.
+        {t("foryou.savedAndRemindersBody")}
       </p>
 
       <div className="mt-3 grid gap-2 sm:grid-cols-2">
@@ -29,11 +33,13 @@ export function WorkspaceTools({
           <div className="flex items-start gap-2.5">
             <Bookmark size={14} className="mt-0.5 text-[var(--accent)]" aria-hidden="true" />
             <div>
-              <p className="text-[11px] font-medium">Saved resources</p>
+              <p className="text-[11px] font-medium">{t("foryou.savedResources")}</p>
               <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
                 {savedCount === 0
-                  ? "No resources saved yet"
-                  : `${savedCount} ${savedCount === 1 ? "resource" : "resources"} saved`}
+                  ? t("foryou.noSaved")
+                  : t(savedCount === 1 ? "foryou.savedCountOne" : "foryou.savedCountMany", {
+                      count: savedCount,
+                    })}
               </p>
             </div>
           </div>
@@ -51,13 +57,19 @@ export function WorkspaceTools({
           <div className="flex items-start gap-2.5">
             <CalendarClock size={14} className="mt-0.5 text-[var(--accent)]" aria-hidden="true" />
             <div>
-              <p className="text-[11px] font-medium">Reminders</p>
+              <p className="text-[11px] font-medium">{t("foryou.reminders")}</p>
               <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
                 {reminders.total === 0
-                  ? "No reminders yet"
+                  ? t("foryou.noReminders")
                   : due > 0
-                    ? `${reminders.overdue} overdue · ${reminders.dueToday} due today`
-                    : `${reminders.upcoming} upcoming · ${reminders.completed} completed`}
+                    ? t("foryou.overdueDue", {
+                        overdue: reminders.overdue,
+                        today: reminders.dueToday,
+                      })
+                    : t("foryou.upcomingCompleted", {
+                        upcoming: reminders.upcoming,
+                        completed: reminders.completed,
+                      })}
               </p>
             </div>
           </div>

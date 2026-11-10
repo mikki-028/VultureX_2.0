@@ -37,6 +37,10 @@ function hrefFor(
   }
   if (type === "reminder_due") return "/knowledge-hub/for-you/reminders";
   if (type === "business_match") return "/discover";
+  if (type.startsWith("pitch_deck"))
+    return role === "admin" ? "/admin/pitch-decks" : "/pitch-decks";
+  if (type === "impact_submitted") return "/admin/impact";
+  if (type === "impact_review") return "/knowledge-hub/impact";
   if (type.startsWith("competition")) {
     if (!competitionId) return "/competitions";
     if (type === "competition_application_status")

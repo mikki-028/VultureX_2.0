@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { PlusCircle, Trophy, Users } from "lucide-react";
+import { PlusCircle, Users } from "lucide-react";
+// Icons passed as props to client components must cross a client boundary.
+import { Trophy } from "@/components/competitions/icons";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { StatusChip } from "@/components/competitions/StatusChip";
 import { getCompetitionActor, getInvestorCompetitions } from "@/features/competitions";

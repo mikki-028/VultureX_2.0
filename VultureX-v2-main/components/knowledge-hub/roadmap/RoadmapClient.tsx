@@ -15,6 +15,7 @@ import {
   SkipForward,
   Sparkles,
   Target,
+  Trash2,
 } from "lucide-react";
 import type {
   RoadmapMilestoneView,
@@ -77,7 +78,7 @@ export function RoadmapClient({
   async function mutate(
     key: string,
     url: string,
-    method: "POST" | "PATCH",
+    method: "POST" | "PATCH" | "DELETE",
     body?: unknown
   ): Promise<boolean> {
     setBusy(key);
@@ -122,6 +123,13 @@ export function RoadmapClient({
     await mutate(`task-date:${task.id}`, `/api/roadmap/tasks/${task.id}`, "PATCH", {
       dueDate: value || null,
     });
+  }
+
+  async function deleteTask(task: RoadmapTaskView) {
+    if (task.source !== "custom") return;
+    if (!window.confirm(`Delete “${task.title}”? This cannot be undone.`)) return;
+    const ok = await mutate(`delete-task:${task.id}`, `/api/roadmap/tasks/${task.id}`, "DELETE");
+    if (ok) setNotice("Custom task deleted.");
   }
 
   async function submitTask(event: FormEvent<HTMLFormElement>) {
@@ -589,6 +597,21 @@ export function RoadmapClient({
                     <CalendarDays size={10} aria-hidden="true" />
                     Set reminder
                   </Link>
+                  {task.source === "custom" && (
+                    <button
+                      type="button"
+                      onClick={() => void deleteTask(task)}
+                      disabled={isBusy}
+                      className="inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] text-[var(--red)] hover:bg-[var(--red-muted)] disabled:opacity-50"
+                    >
+                      {busy === `delete-task:${task.id}` ? (
+                        <Loader2 size={10} className="animate-spin" />
+                      ) : (
+                        <Trash2 size={10} aria-hidden="true" />
+                      )}
+                      Delete
+                    </button>
+                  )}
                 </div>
               </li>
             ))}

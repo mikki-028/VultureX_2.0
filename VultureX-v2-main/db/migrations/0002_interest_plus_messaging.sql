@@ -95,9 +95,9 @@ CREATE UNIQUE INDEX "unique_notification_message" ON "notifications" USING btree
 -- legacy rows (which stay the source of truth for the old dashboard counters).
 INSERT INTO "connection_requests" ("sender_user_id", "recipient_user_id", "pair_key", "message", "status", "created_at", "updated_at", "responded_at")
 SELECT
-  iu."user_id",
-  su."user_id",
-  least(iu."user_id"::text, su."user_id"::text) || ':' || greatest(iu."user_id"::text, su."user_id"::text),
+  iu."id",
+  su."id",
+  least(iu."id"::text, su."id"::text) || ':' || greatest(iu."id"::text, su."id"::text),
   i."message",
   CASE i."status" WHEN 'accepted' THEN 'accepted' WHEN 'declined' THEN 'rejected' ELSE 'pending' END,
   COALESCE(i."created_at", now()),

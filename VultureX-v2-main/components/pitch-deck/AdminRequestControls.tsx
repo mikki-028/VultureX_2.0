@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  AlertTriangle, Check, FileUp, Loader2, Megaphone, MessageSquarePlus, Upload,
+  AlertTriangle, Check, FileUp, Loader2, Megaphone, MessageSquarePlus, Upload, XCircle,
 } from "lucide-react";
 import { formatBytes } from "@/features/pitch-deck/files";
 
@@ -40,7 +40,12 @@ export function AdminRequestControls({
   const [confirmPublish, setConfirmPublish] = useState(false);
   const [note, setNote] = useState(adminNote ?? "");
   const [busy, setBusy] = useState(false);
+  const [reason, setReason] = useState("");
+  const [rejecting, setRejecting] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const rejected = status === "rejected";
+  const canOperate = !rejected && status !== "completed";
+  const canReject = status === "pending_approval" || status === "approved" || status === "in_progress";
 
   function uploadFile(file: File) {
     if (uploading) return;
@@ -105,6 +110,35 @@ export function AdminRequestControls({
     }
   }
 
+  async function reject() {
+    const trimmed = reason.trim();
+    if (trimmed.length < 5) {
+      setError("Provide a clear reason (at least 5 characters) so the founder knows what to fix.");
+      return;
+    }
+    setRejecting(true);
+    setError("");
+    setMessage("");
+    try {
+      const res = await fetch(`/api/admin/pitch-deck/requests/${requestId}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Rejection failed.");
+        return;
+      }
+      setMessage("Request rejected. The founder can now see the reason and reopen it.");
+      router.refresh();
+    } catch {
+      setError("Rejection failed. Please try again.");
+    } finally {
+      setRejecting(false);
+    }
+  }
+
   async function patchStatus(payload: { status?: string; note?: string }) {
     setBusy(true);
     setError("");
@@ -150,6 +184,11 @@ export function AdminRequestControls({
         <p className="text-[10px] text-[var(--text-muted)] mb-3">
           PDF or PPTX, up to 20 MB. Uploading never publishes — you publish explicitly below.
         </p>
+        {rejected && (
+          <p className="mb-3 rounded-md border border-[var(--red)]/30 bg-[var(--red-muted)] px-3 py-2 text-[10px] text-[var(--red)]">
+            This request was rejected. Uploads stay blocked until the founder reopens it.
+          </p>
+        )}
 
         <label className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium border border-[var(--border)] rounded-md cursor-pointer text-[var(--text-secondary)] hover:border-[var(--border-hover)] transition-colors">
           {uploading ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
@@ -159,7 +198,7 @@ export function AdminRequestControls({
             type="file"
             accept=".pdf,.pptx,.ppt,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation"
             className="hidden"
-            disabled={uploading}
+            disabled={uploading || !canOperate}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) uploadFile(file);
@@ -240,7 +279,7 @@ export function AdminRequestControls({
             {!confirmPublish ? (
               <button
                 onClick={() => setConfirmPublish(true)}
-                disabled={!selectedFileId || !hasApprovedSummary || status === "completed"}
+                disabled={!selectedFileId || !hasApprovedSummary || !canOperate}
                 className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium bg-[var(--accent-fill)] text-[var(--accent-foreground)] rounded-md hover:bg-[var(--accent-hover)] disabled:opacity-40 transition-colors"
               >
                 <Megaphone size={12} /> Publish Pitch Deck
@@ -278,14 +317,14 @@ export function AdminRequestControls({
         <div className="flex flex-wrap items-center gap-2 mb-4">
           <button
             onClick={() => patchStatus({ status: "approved" })}
-            disabled={busy || !hasApprovedSummary}
+            disabled={busy || !hasApprovedSummary || !canOperate}
             className="px-3 py-1.5 text-[11px] rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-40"
           >
             Approved (queued)
           </button>
           <button
             onClick={() => patchStatus({ status: "in_progress" })}
-            disabled={busy || !hasApprovedSummary}
+            disabled={busy || !hasApprovedSummary || !canOperate}
             className="px-3 py-1.5 text-[11px] rounded-md border border-[var(--border)] text-[var(--text-muted)] hover:text-[var(--text-secondary)] disabled:opacity-40"
           >
             Mark in progress
@@ -312,6 +351,36 @@ export function AdminRequestControls({
           </button>
         </div>
       </section>
+
+      {/* Rejection */}
+      {canReject && (
+        <section className="rounded-xl border border-[var(--red)]/30 bg-[var(--bg-card)] p-5">
+          <h2 className="text-xs font-medium text-[var(--red)] mb-1 flex items-center gap-2">
+            <XCircle size={12} /> Reject request
+          </h2>
+          <p className="text-[10px] text-[var(--text-muted)] mb-3">
+            The reason is saved, shown to the founder, and included in their notification. The
+            request cannot be uploaded or published until the founder reopens it.
+          </p>
+          <textarea
+            value={reason}
+            onChange={(event) => setReason(event.target.value)}
+            rows={3}
+            maxLength={500}
+            placeholder="Explain what the founder needs to change…"
+            className="w-full px-3 py-2 text-xs rounded-md border border-[var(--border)] bg-[var(--bg)] text-[var(--text)] focus:outline-none focus:border-[var(--border-hover)]"
+          />
+          <button
+            type="button"
+            onClick={() => void reject()}
+            disabled={rejecting || reason.trim().length < 5}
+            className="mt-2 inline-flex items-center gap-1.5 px-3 py-2 text-[11px] font-medium rounded-md border border-[var(--red)]/40 text-[var(--red)] hover:bg-[var(--red-muted)] disabled:opacity-40"
+          >
+            {rejecting ? <Loader2 size={11} className="animate-spin" /> : <XCircle size={11} />}
+            Reject with reason
+          </button>
+        </section>
+      )}
     </div>
   );
 }

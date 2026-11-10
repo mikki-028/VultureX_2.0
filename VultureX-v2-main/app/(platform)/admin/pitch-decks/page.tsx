@@ -14,6 +14,7 @@ const FILTERS: { value: string; label: string }[] = [
   { value: "pending_approval", label: "Unapproved" },
   { value: "approved", label: "Approved" },
   { value: "in_progress", label: "In progress" },
+  { value: "rejected", label: "Changes required" },
   { value: "completed", label: "Completed" },
   { value: "incomplete", label: "Incomplete" },
 ];

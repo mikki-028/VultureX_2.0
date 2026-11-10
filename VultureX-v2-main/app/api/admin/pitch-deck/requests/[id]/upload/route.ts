@@ -34,6 +34,12 @@ export async function POST(
       { status: 409 },
     );
   }
+  if (record.status === "rejected") {
+    return NextResponse.json(
+      { error: "This request was rejected. The founder must reopen it before a deck can be uploaded." },
+      { status: 409 },
+    );
+  }
 
   const form = await request.formData();
   const file = form.get("file");

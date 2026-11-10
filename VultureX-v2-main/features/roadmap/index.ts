@@ -259,6 +259,34 @@ export async function updateTask(
   return row ? toTaskView(row) : null;
 }
 
+/** Deletes a task only when it is a custom task owned by the caller. */
+export async function deleteCustomTask(
+  userId: string,
+  taskId: string
+): Promise<"deleted" | "not_found" | "template"> {
+  const [existing] = await db
+    .select({ source: roadmapTasks.source })
+    .from(roadmapTasks)
+    .where(and(eq(roadmapTasks.id, taskId), eq(roadmapTasks.userId, userId)))
+    .limit(1);
+
+  if (!existing) return "not_found";
+  if (existing.source !== "custom") return "template";
+
+  const deleted = await db
+    .delete(roadmapTasks)
+    .where(
+      and(
+        eq(roadmapTasks.id, taskId),
+        eq(roadmapTasks.userId, userId),
+        eq(roadmapTasks.source, "custom")
+      )
+    )
+    .returning({ id: roadmapTasks.id });
+
+  return deleted.length > 0 ? "deleted" : "not_found";
+}
+
 export async function createMilestone(
   userId: string,
   startupId: string,

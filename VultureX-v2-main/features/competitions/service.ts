@@ -1489,6 +1489,7 @@ export async function publishCompetition(
         sector: competition.sector,
         deadline: competition.deadline,
         prize: competition.prize,
+        eligibility: competition.eligibility,
       },
       competition.hostOrganization || hostLabel(hostInvestor),
       prizeLabel({

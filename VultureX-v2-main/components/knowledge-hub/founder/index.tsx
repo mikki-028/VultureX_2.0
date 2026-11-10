@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { NotificationBell } from "@/components/shared/NotificationBell";
+import { translatorFor, type Locale, type MessageKey } from "@/features/i18n/messages";
 
 export type FounderAction = {
   title: string;
@@ -65,17 +66,20 @@ export function FounderTopBar({
   stage,
   initial,
   profileHref,
+  locale = "en",
 }: {
   stage: string | null;
   initial: string;
   profileHref: string;
+  locale?: Locale;
 }) {
+  const t = translatorFor(locale);
   return (
     <div className="mb-5 flex items-center justify-between gap-3 border-b border-[var(--border)] pb-3">
       <div className="flex items-center gap-2">
         <span className="text-xs font-semibold tracking-tight">VultureX</span>
         <span className="h-3 w-px bg-[var(--border)]" aria-hidden="true" />
-        <span className="vx-label">For You</span>
+        <span className="vx-label">{t("foryou.eyebrow")}</span>
       </div>
 
       <div className="flex items-center gap-2">
@@ -87,7 +91,7 @@ export function FounderTopBar({
         <NotificationBell />
         <Link
           href={profileHref}
-          aria-label="Your profile"
+          aria-label={t("foryou.profileAria")}
           className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--accent)]/30 bg-[var(--accent-muted)] text-[10px] font-semibold text-[var(--accent)]"
         >
           {initial}
@@ -107,6 +111,7 @@ export function WelcomeCard({
   objective,
   language,
   editProfileHref,
+  locale = "en",
 }: {
   name: string | null;
   stage: string | null;
@@ -117,23 +122,23 @@ export function WelcomeCard({
   objective?: string | null;
   language?: string | null;
   editProfileHref?: string | null;
+  locale?: Locale;
 }) {
+  const t = translatorFor(locale);
   return (
     <section className="vx-card relative overflow-hidden p-5">
       <div
-        className="pointer-events-none absolute -right-14 -top-20 h-44 w-44 rounded-full bg-[var(--accent-muted)]"
+        className="vx-decorative pointer-events-none absolute -right-14 -top-20 h-44 w-44 rounded-full bg-[var(--accent-muted)]"
         aria-hidden="true"
       />
       <div className="relative">
-        <p className="vx-label">{signedIn ? "Welcome back" : "Founder workspace"}</p>
+        <p className="vx-label">{t(signedIn ? "foryou.welcomeBack" : "foryou.workspace")}</p>
         <h1 className="mt-2 text-xl font-semibold tracking-tight sm:text-2xl">
-          {signedIn && name ? `Welcome back, ${name}` : "Your founder workspace"}
+          {signedIn && name ? t("foryou.welcomeName", { name }) : t("foryou.workspaceTitle")}
         </h1>
         <p className="mt-2 max-w-xl text-xs leading-relaxed text-[var(--text-secondary)]">
           {tagline ||
-            (signedIn
-              ? "Your stage, next actions and metrics are read from your startup profile."
-              : "Sign in to see your stage, next actions and metrics. The Knowledge Hub stays open to everyone.")}
+            t(signedIn ? "foryou.emptyTagline" : "foryou.emptySignedOut")}
         </p>
 
         <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -162,7 +167,7 @@ export function WelcomeCard({
               href={profileHref}
               className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
             >
-              View profile
+              {t("foryou.viewProfile")}
               <ArrowUpRight size={11} aria-hidden="true" />
             </Link>
           )}
@@ -171,7 +176,7 @@ export function WelcomeCard({
               href={editProfileHref}
               className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:text-[var(--text)]"
             >
-              {objective ? "Edit founder profile" : "Set up founder profile"}
+              {t(objective ? "foryou.editProfile" : "foryou.setupProfile")}
               <ArrowRight size={11} aria-hidden="true" />
             </Link>
           )}
@@ -181,56 +186,58 @@ export function WelcomeCard({
   );
 }
 
-export function FounderProgress({ stage }: { stage: string | null }) {
+export function FounderProgress({ stage, locale = "en" }: { stage: string | null; locale?: Locale }) {
+  const t = translatorFor(locale);
   return (
     <section
-      aria-label="Founder progress and sprint"
+      aria-label={t("foryou.progressAria")}
       className="vx-card flex flex-wrap items-center justify-between gap-3 px-4 py-3"
     >
       <div className="flex items-center gap-2">
         <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" aria-hidden="true" />
-        <span className="text-xs font-medium">{stage ?? "Stage not set"}</span>
-        <span className="vx-label">Founder stage</span>
+        <span className="text-xs font-medium">{stage ?? t("foryou.stageNotSet")}</span>
+        <span className="vx-label">{t("foryou.founderStage")}</span>
       </div>
       <div className="flex items-center gap-2">
-        <span className="vx-label">Sprint</span>
+        <span className="vx-label">{t("foryou.sprint")}</span>
         <span className="rounded border border-[var(--border)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[10px] text-[var(--text-muted)]">
-          Not connected yet
+          {t("foryou.notConnected")}
         </span>
       </div>
     </section>
   );
 }
 
-export function NextActions({ actions }: { actions: FounderAction[] }) {
+export function NextActions({ actions, locale = "en" }: { actions: FounderAction[]; locale?: Locale }) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="next-actions-heading" className="vx-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className="vx-label">Focus</p>
+          <p className="vx-label">{t("foryou.focus")}</p>
           <h2 id="next-actions-heading" className="mt-1 text-lg font-semibold tracking-tight">
-            Your next three actions
+            {t("foryou.nextThree")}
           </h2>
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Small steps chosen from your startup’s current state.
+            {t("foryou.nextSubtitle")}
           </p>
         </div>
         <span className="rounded border border-[var(--accent)]/25 bg-[var(--accent-muted)] px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
-          {actions.length} pending
+          {t("foryou.pending", { count: actions.length })}
         </span>
       </div>
 
       {actions.length === 0 ? (
         <div className="vx-inset mt-4 p-5 text-center">
-          <p className="text-sm font-medium">Nothing pending right now</p>
+          <p className="text-sm font-medium">{t("foryou.actionsEmptyTitle")}</p>
           <p className="mx-auto mt-1 max-w-sm text-[11px] leading-relaxed text-[var(--text-muted)]">
-            Your profile has what it needs and there are no open recommendations at this stage.
+            {t("foryou.actionsEmptyBody")}
           </p>
           <Link
             href="/knowledge-hub/start-business"
             className="mt-3 inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
           >
-            Work through a guide
+            {t("foryou.workGuide")}
             <ArrowRight size={11} aria-hidden="true" />
           </Link>
         </div>
@@ -258,14 +265,18 @@ export function NextActions({ actions }: { actions: FounderAction[] }) {
                         : "border-[var(--border)] bg-[var(--bg-elevated)] text-[var(--text-muted)]"
                     }`}
                   >
-                    {action.priority} impact
+                    {t(
+                      action.priority === "High"
+                        ? "foryou.highImpact"
+                        : "foryou.mediumImpact"
+                    )}
                   </span>
                 </div>
 
                 <div className="vx-inset mt-3 p-2.5">
                   <p className="flex items-center gap-1.5 text-[9px] uppercase tracking-wide text-[var(--text-muted)]">
                     <Sparkles size={10} className="text-[var(--accent)]" aria-hidden="true" />
-                    Why recommended
+                    {t("foryou.whyRecommended")}
                   </p>
                   <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-secondary)]">
                     {action.why}
@@ -300,30 +311,36 @@ export function NextActions({ actions }: { actions: FounderAction[] }) {
   );
 }
 
-export function LearningPanel({ items }: { items: LearningItem[] }) {
+export function LearningPanel({
+  items,
+  locale = "en",
+}: {
+  items: LearningItem[];
+  locale?: Locale;
+}) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="learning-heading" className="vx-card p-5">
-      <p className="vx-label">Learning</p>
+      <p className="vx-label">{t("foryou.learning")}</p>
       <h2 id="learning-heading" className="mt-1 text-lg font-semibold tracking-tight">
-        Continue learning
+        {t("foryou.continueLearning")}
       </h2>
-      <p className="mt-1 text-xs text-[var(--text-muted)]">Pick up where you left off.</p>
+      <p className="mt-1 text-xs text-[var(--text-muted)]">{t("foryou.pickUp")}</p>
 
       {items.length === 0 ? (
         <div className="vx-inset mt-3 p-4">
           <div className="flex items-center gap-2">
             <BookOpen size={14} className="text-[var(--accent)]" aria-hidden="true" />
-            <p className="text-xs font-medium">No learning in progress yet</p>
+            <p className="text-xs font-medium">{t("foryou.noLearning")}</p>
           </div>
           <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-            Progress appears here once a hub guide records it for your account. Nothing is marked
-            complete by default.
+            {t("foryou.noLearningBody")}
           </p>
           <Link
             href="/knowledge-hub/start-business"
             className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
           >
-            Start with the founder journey
+            {t("foryou.startJourney")}
             <ArrowRight size={11} aria-hidden="true" />
           </Link>
         </div>
@@ -354,7 +371,7 @@ export function LearningPanel({ items }: { items: LearningItem[] }) {
                 href={item.href}
                 className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
               >
-                Continue learning
+                {t("foryou.continueAction")}
                 <ArrowRight size={10} aria-hidden="true" />
               </Link>
             </li>
@@ -365,22 +382,29 @@ export function LearningPanel({ items }: { items: LearningItem[] }) {
   );
 }
 
-export function MetricsPanel({ metrics }: { metrics: FounderMetric[] }) {
+export function MetricsPanel({
+  metrics,
+  locale = "en",
+}: {
+  metrics: FounderMetric[];
+  locale?: Locale;
+}) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="metrics-heading" className="vx-card p-5">
-      <p className="vx-label">Relevant numbers</p>
+      <p className="vx-label">{t("foryou.relevantNumbers")}</p>
       <h2 id="metrics-heading" className="mt-1 text-lg font-semibold tracking-tight">
-        Founder metrics
+        {t("foryou.founderMetrics")}
       </h2>
       <p className="mt-1 text-xs text-[var(--text-muted)]">
-        Only figures recorded on your profile.
+        {t("foryou.metricsSubtitle")}
       </p>
 
       {metrics.length === 0 ? (
         <div className="vx-inset mt-3 p-4">
-          <p className="text-xs font-medium">No metrics recorded yet</p>
+          <p className="text-xs font-medium">{t("foryou.noMetrics")}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-            Metrics appear once your startup profile is live.
+            {t("foryou.noMetricsBody")}
           </p>
         </div>
       ) : (
@@ -404,40 +428,46 @@ export function MetricsPanel({ metrics }: { metrics: FounderMetric[] }) {
   );
 }
 
-export function OpportunitiesPanel({ items }: { items: OpportunityItem[] }) {
+export function OpportunitiesPanel({
+  items,
+  locale = "en",
+}: {
+  items: OpportunityItem[];
+  locale?: Locale;
+}) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="opportunities-heading" className="vx-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <p className="vx-label">Live programmes</p>
+          <p className="vx-label">{t("foryou.livePrograms")}</p>
           <h2 id="opportunities-heading" className="mt-1 text-lg font-semibold tracking-tight">
-            Opportunities
+            {t("foryou.opportunities")}
           </h2>
           <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Competitions and programmes currently published on VultureX.
+            {t("foryou.opportunitiesSubtitle")}
           </p>
         </div>
         <Link
           href="/competitions"
           className="inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
         >
-          Browse all
+          {t("foryou.browseAll")}
           <ArrowRight size={11} aria-hidden="true" />
         </Link>
       </div>
 
       {items.length === 0 ? (
         <div className="vx-inset mt-3 p-4">
-          <p className="text-xs font-medium">No opportunities published yet</p>
+          <p className="text-xs font-medium">{t("foryou.noOpportunities")}</p>
           <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-            New competitions appear here once a host publishes them. VultureX does not create
-            listings to fill this space.
+            {t("foryou.noOpportunitiesBody")}
           </p>
           <Link
             href="/competitions"
             className="mt-2 inline-flex items-center gap-1 text-[11px] font-medium text-[var(--accent)]"
           >
-            Open competitions
+            {t("foryou.openCompetitions")}
             <ArrowRight size={11} aria-hidden="true" />
           </Link>
         </div>
@@ -458,14 +488,16 @@ export function OpportunitiesPanel({ items }: { items: OpportunityItem[] }) {
                   </div>
                   <p className="mt-1 text-xs font-medium">{item.title}</p>
                   <p className="mt-0.5 text-[10px] text-[var(--text-muted)]">
-                    {deadline ? `Deadline ${deadline} (UTC)` : "Deadline not published"}
+                    {deadline
+                      ? t("foryou.deadline", { date: deadline })
+                      : t("foryou.deadlineNotPublished")}
                   </p>
                 </div>
                 <Link
                   href={`/competitions/${item.id}`}
                   className="inline-flex shrink-0 items-center gap-1 rounded-md border border-[var(--border)] px-2.5 py-1 text-[10px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text)]"
                 >
-                  View details
+                  {t("foryou.viewDetails")}
                   <ArrowUpRight size={10} aria-hidden="true" />
                 </Link>
               </li>
@@ -477,26 +509,26 @@ export function OpportunitiesPanel({ items }: { items: OpportunityItem[] }) {
   );
 }
 
-const COMMUNITY_LINKS = [
-  { label: "Founder discussions", href: "/knowledge-hub/community" },
-  { label: "Peer groups", href: "/knowledge-hub/community#peer-groups" },
-  { label: "Expert resources", href: "/knowledge-hub/community#expert-access" },
-  { label: "Workshops", href: "/knowledge-hub/community#workshops" },
+const COMMUNITY_LINKS: { label: MessageKey; href: string }[] = [
+  { label: "foryou.founderDiscussions", href: "/knowledge-hub/community" },
+  { label: "foryou.peerGroups", href: "/knowledge-hub/community#peer-groups" },
+  { label: "foryou.expertResources", href: "/knowledge-hub/community#expert-access" },
+  { label: "foryou.workshops", href: "/knowledge-hub/community#workshops" },
 ];
 
-export function CommunityPanel() {
+export function CommunityPanel({ locale = "en" }: { locale?: Locale }) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="community-heading" className="vx-card p-5">
       <div className="flex items-center gap-2">
         <Users size={14} className="text-[var(--accent)]" aria-hidden="true" />
-        <p className="vx-label">Community</p>
+        <p className="vx-label">{t("foryou.community")}</p>
       </div>
       <h2 id="community-heading" className="mt-2 text-sm font-semibold tracking-tight">
-        Founders and experts
+        {t("foryou.communityTitle")}
       </h2>
       <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-        Find founders working on adjacent problems and specialists who have seen your stage
-        before.
+        {t("foryou.communityBody")}
       </p>
 
       <ul className="mt-3 space-y-1">
@@ -506,7 +538,7 @@ export function CommunityPanel() {
               href={link.href}
               className="flex items-center justify-between gap-2 rounded px-1 py-1 text-[11px] text-[var(--text-secondary)] transition-colors hover:text-[var(--text)]"
             >
-              {link.label}
+              {t(link.label)}
               <ArrowRight size={10} aria-hidden="true" />
             </Link>
           </li>
@@ -517,56 +549,62 @@ export function CommunityPanel() {
         href="/explore"
         className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] px-3 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text)]"
       >
-        Browse founders
+        {t("foryou.browseFounders")}
         <ArrowRight size={11} aria-hidden="true" />
       </Link>
     </section>
   );
 }
 
-export function AlertPanel() {
+export function AlertPanel({ locale = "en" }: { locale?: Locale }) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="alert-heading" className="vx-card p-5">
       <div className="flex items-center gap-2">
         <ShieldAlert size={14} className="text-[var(--accent)]" aria-hidden="true" />
-        <p className="vx-label">Security notice</p>
+        <p className="vx-label">{t("foryou.securityNotice")}</p>
       </div>
       <h2 id="alert-heading" className="mt-2 text-sm font-semibold tracking-tight">
-        Stay alert
+        {t("foryou.stayAlert")}
       </h2>
       <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-        Unsolicited funding offers that ask for an upfront fee are a common scam pattern. Review
-        the signs before you share documents, grant access or move money.
+        {t("foryou.securityBody")}
       </p>
       <Link
         href="/knowledge-hub/scam-watch"
         className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] px-3 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text)]"
       >
-        View safety tips
+        {t("foryou.safetyTips")}
         <ArrowRight size={11} aria-hidden="true" />
       </Link>
     </section>
   );
 }
 
-export function ImpactPanel({ goals }: { goals: string[] }) {
+export function ImpactPanel({
+  goals,
+  locale = "en",
+}: {
+  goals: string[];
+  locale?: Locale;
+}) {
+  const t = translatorFor(locale);
   return (
     <section aria-labelledby="impact-heading" className="vx-card p-5">
       <div className="flex items-center gap-2">
         <Leaf size={14} className="text-[var(--accent)]" aria-hidden="true" />
-        <p className="vx-label">Impact Hub</p>
+        <p className="vx-label">{t("section.impact")}</p>
       </div>
       <h2 id="impact-heading" className="mt-2 text-sm font-semibold tracking-tight">
-        Measure your impact
+        {t("foryou.impactTitle")}
       </h2>
       <p className="mt-1 text-[11px] leading-relaxed text-[var(--text-muted)]">
-        Define who benefits, what changed and what you can evidence — before you put a claim in
-        front of customers or investors.
+        {t("foryou.impactBody")}
       </p>
 
       {goals.length > 0 && (
         <div className="mt-3">
-          <p className="vx-label">Self-declared SDG alignment · not verified</p>
+          <p className="vx-label">{t("foryou.sdgAlignment")}</p>
           <ul className="mt-1.5 flex flex-wrap gap-1.5">
             {goals.map((goal) => (
               <li
@@ -584,7 +622,7 @@ export function ImpactPanel({ goals }: { goals: string[] }) {
         href="/knowledge-hub/impact"
         className="mt-3 inline-flex items-center gap-1.5 rounded-md border border-[var(--border)] px-3 py-1.5 text-[11px] font-medium text-[var(--text-secondary)] transition-colors hover:border-[var(--border-hover)] hover:text-[var(--text)]"
       >
-        Explore Impact Hub
+        {t("foryou.exploreImpact")}
         <ArrowRight size={11} aria-hidden="true" />
       </Link>
     </section>

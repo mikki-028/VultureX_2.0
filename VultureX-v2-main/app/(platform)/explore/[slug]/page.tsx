@@ -1,8 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { startups, startupImpactClaims } from "@/db/schema";
+import { startups, startupImpactClaims, pitchDeckFiles } from "@/db/schema";
 import { auth } from "@/features/auth";
 import { getInterestStatus } from "@/features/connections";
 import { SdgChips } from "@/components/sdg/SdgChips";
@@ -12,7 +12,7 @@ import { InterestPlusButton } from "@/components/connections/InterestPlusButton"
 import { SaveButton } from "@/components/investor/SaveButton";
 import { ProfileAnimations, AnimatedSection, AnimatedMetric, AnimatedBar } from "./animations";
 import { ViewTracker } from "@/components/shared/ViewTracker";
-import { MapPin, Globe, Users, TrendingUp, DollarSign, Calendar, ExternalLink } from "lucide-react";
+import { MapPin, Globe, Users, TrendingUp, DollarSign, Calendar, ExternalLink, Download, FileText } from "lucide-react";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -31,6 +31,20 @@ export default async function StartupProfilePage({ params }: Props) {
 
   const session = await auth();
   const isInvestor = (session?.user as { role?: string })?.role === "investor";
+  const [publishedDeck] = isInvestor
+    ? await db
+        .select({ id: pitchDeckFiles.id, fileName: pitchDeckFiles.fileName })
+        .from(pitchDeckFiles)
+        .where(
+          and(
+            eq(pitchDeckFiles.startupId, startup.id),
+            eq(pitchDeckFiles.kind, "deck"),
+            eq(pitchDeckFiles.isPublished, true),
+          ),
+        )
+        .orderBy(desc(pitchDeckFiles.publishedAt))
+        .limit(1)
+    : [];
   const interest =
     session?.user?.id && startup.userId
       ? await getInterestStatus(session.user.id, startup.userId)
@@ -110,6 +124,35 @@ export default async function StartupProfilePage({ params }: Props) {
             </div>
           )}
         </AnimatedSection>
+
+        {/* Approved pitch deck (investors only, after publication) */}
+        {isInvestor && publishedDeck && (
+          <AnimatedSection delay={0.12} className="mb-8 rounded-xl border border-[var(--border)] bg-[var(--bg-card)] p-5">
+            <p className="text-xs font-medium text-[var(--text-muted)] mb-3">Pitch deck</p>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <FileText size={14} className="text-[var(--accent)] shrink-0" />
+                <span className="text-sm text-[var(--text-secondary)] truncate">{publishedDeck.fileName}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <a
+                  href={`/api/files/${publishedDeck.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-3 py-1.5 text-[11px] border border-[var(--border)] rounded-md text-[var(--text-muted)] hover:text-[var(--accent)] transition-colors"
+                >
+                  View deck
+                </a>
+                <a
+                  href={`/api/files/${publishedDeck.id}?download=1`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-medium border border-[var(--accent)]/40 text-[var(--accent)] rounded-md hover:bg-[var(--accent-muted)] transition-colors"
+                >
+                  <Download size={11} /> Download
+                </a>
+              </div>
+            </div>
+          </AnimatedSection>
+        )}
 
         {/* Metrics */}
         <AnimatedSection delay={0.15} className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
