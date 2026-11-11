@@ -3,8 +3,9 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { users, startups, investors, competitions, decks } from "./schema";
 import { hash } from "bcryptjs";
 import crypto from "crypto";
+import { resolveDatabaseUrl } from "./config";
 
-const connectionString = process.env.DATABASE_URL!;
+const connectionString = resolveDatabaseUrl();
 const client = postgres(connectionString, { prepare: false });
 const db = drizzle(client);
 

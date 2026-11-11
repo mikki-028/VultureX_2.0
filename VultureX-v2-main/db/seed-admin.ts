@@ -15,18 +15,25 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import { eq } from "drizzle-orm";
 import { hash } from "bcryptjs";
 import { users } from "./schema";
+import { resolveDatabaseUrl } from "./config";
 
 async function main() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    console.error("DATABASE_URL is not set. Add it to .env before seeding.");
+  const connectionString = resolveDatabaseUrl();
+
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+
+  // No defaults: an operator must state which account to promote and with
+  // which password. Guessing here is how a real credential ends up in Git.
+  if (!email) {
+    console.error("ADMIN_EMAIL is not set. Pass the account email to promote.");
     process.exit(1);
   }
 
-  const email = (process.env.ADMIN_EMAIL ?? "asmita.gupta008@gmail.com")
-    .trim()
-    .toLowerCase();
-  const password = process.env.ADMIN_PASSWORD ?? "vulturex";
+  if (!password) {
+    console.error("ADMIN_PASSWORD is not set. Pass the password to set on that account.");
+    process.exit(1);
+  }
 
   if (password.length < 6) {
     console.error("ADMIN_PASSWORD must be at least 6 characters.");
@@ -59,12 +66,6 @@ async function main() {
       emailVerified: true,
     });
     console.log(`✓ Admin account created: ${email}`);
-  }
-
-  if (!process.env.ADMIN_PASSWORD) {
-    console.log(
-      "⚠ Using the default password from the brief. Set ADMIN_PASSWORD to rotate it.",
-    );
   }
 
   await client.end();

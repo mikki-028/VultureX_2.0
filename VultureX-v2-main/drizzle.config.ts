@@ -1,5 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 import { config } from "dotenv";
+import { resolveDatabaseUrl } from "./db/config";
 
 // Match Next.js precedence: .env.local overrides .env. Without this, the CLI
 // could not see a DATABASE_URL that only exists in .env.local.
@@ -10,6 +11,8 @@ export default defineConfig({
   out: "./db/migrations",
   dialect: "postgresql",
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    // Fails loudly when DATABASE_URL is absent instead of letting the CLI
+    // fall back to localhost.
+    url: resolveDatabaseUrl(),
   },
 });

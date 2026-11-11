@@ -19,7 +19,8 @@
     "test:sdg": "node --import tsx --test features/sdg/sdg.test.ts",
     "test:roadmap": "node --import tsx --test features/roadmap/roadmap.test.ts",
     "test:reminders": "node --import tsx --test features/reminders/reminders.test.ts",
-    "test:saved-resources": "node --import tsx --test features/saved-resources/catalog.test.ts"
+    "test:saved-resources": "node --import tsx --test features/saved-resources/catalog.test.ts",
+    "test:db-config": "node --import tsx --test db/config.test.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.2",
