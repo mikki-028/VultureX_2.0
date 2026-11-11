@@ -1,13 +1,14 @@
+import { databaseUrl, testPassword, adminCreds } from "./config.mjs";
 import postgres from "postgres";
 
 const base = "http://127.0.0.1:3000";
 const stamp = Date.now().toString(36);
-const ADMIN = { email: "qa.admin.staging@vulturex.test", password: "qa-staging-admin-123" };
+const ADMIN = adminCreds();
 const INV = `qa.stage.inv.${stamp}@vulturex.test`;
 const OK = `qa.stage.ok.${stamp}@vulturex.test`;
 const NO = `qa.stage.no.${stamp}@vulturex.test`;
-const PASS = "qa-stage-pass-123";
-const db = postgres("postgres://postgres:postgres@127.0.0.1:55432/vulturex_replay", {
+const PASS = testPassword();
+const db = postgres(databaseUrl(), {
   max: 1,
   prepare: false,
 });

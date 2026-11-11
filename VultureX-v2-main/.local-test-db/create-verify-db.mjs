@@ -1,6 +1,7 @@
+import { localDatabaseUrl } from "./config.mjs";
 import postgres from "postgres";
 
-const admin = postgres("postgres://postgres:postgres@127.0.0.1:55432/postgres", {
+const admin = postgres(localDatabaseUrl(), {
   max: 1,
   prepare: false,
   onnotice: () => {},

@@ -4,10 +4,18 @@ import EmbeddedPostgres from "embedded-postgres";
 const port = 55432;
 const databaseDir = path.resolve(".local-test-db/pgdata");
 
+// The disposable local cluster password is never stored in the repository.
+const password = process.env.VX_LOCAL_PG_PASSWORD;
+if (!password) {
+  console.error("Missing required environment variable: VX_LOCAL_PG_PASSWORD");
+  console.error("  expected: any throwaway password for the local Postgres cluster");
+  process.exit(1);
+}
+
 const pg = new EmbeddedPostgres({
   databaseDir,
   user: "postgres",
-  password: "postgres",
+  password,
   port,
   persistent: true,
 });

@@ -1,3 +1,4 @@
+import { testPassword, adminCreds } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
@@ -5,8 +6,8 @@ const base = "http://127.0.0.1:3000";
 const stamp = Date.now().toString(36);
 const S1 = `qa.e2e.admincheck.${stamp}@vulturex.test`;
 const INV = `qa.e2e.admininv.${stamp}@vulturex.test`;
-const PASS = "qa-e2e-pass-123";
-const ADMIN = { email: "asmita.gupta008@gmail.com", password: "vulturex" };
+const PASS = testPassword();
+const ADMIN = adminCreds();
 
 const dbUrl = (fs.readFileSync(".env.local", "utf8").match(/^DATABASE_URL=(.*)$/m) || [])[1].trim();
 const db = postgres(dbUrl, { max: 1, prepare: false, connect_timeout: 20 });

@@ -126,7 +126,7 @@ with `summary_changed_since_approval` showing re-opened summaries everywhere.
 
 ## 5. Admin authorization and publication
 
-* Admins are created **only** by an operator running `npm run db:seed:admin` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`, defaults to the account in the brief, idempotent so it can promote existing users and rotate passwords). The public signup API still accepts only `startup` / `investor`, so nobody can self-assign admin.
+* Admins are created **only** by an operator running `npm run db:seed:admin` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`, both required with no default, idempotent so it can promote existing users and rotate passwords). The public signup API still accepts only `startup` / `investor`, so nobody can self-assign admin.
 * Login now offers **Startup · Investor · Admin**. The credentials provider requires the selected role to equal the stored role, so a startup/investor cannot sign in through the Admin option, and an admin cannot sign in through another option.
 * RBAC is enforced server-side in three places: `/admin` layout guard, `requireAdmin()` in every admin API route, and `loadRequestForActor()` for per-request ownership. Middleware only adds an early session check.
 * `/admin` shows platform totals and a **Pitch Deck Requests** entry; `/admin/pitch-decks` filters by All / Unapproved / Approved / In progress / Completed / Incomplete and shows startup, submission, approval and publication dates.
@@ -160,7 +160,7 @@ migrations:
 
 Accounts seeded (bcrypt hashes, `email_verified = true`):
 
-* `asmita.gupta008@gmail.com` / `vulturex` — **admin**
+* `admin@example.com` / `vulturex` — **admin**
 * `founder@vulturex.test` / `demo123` — startup, with a “Testing Labs” profile
 * `investor@vulturex.test` / `demo123` — investor, with a profile
 

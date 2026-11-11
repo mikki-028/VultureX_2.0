@@ -1,8 +1,9 @@
+import { testPassword } from "./config.mjs";
 import fs from "node:fs";
 
 const base = "http://127.0.0.1:3000";
 const email = `qa.e2e.probe.${Date.now().toString(36)}@vulturex.test`;
-const pass = "qa-e2e-pass-123";
+const pass = testPassword();
 const jar = new Map();
 function store(r) {
   for (const raw of r.headers.getSetCookie?.() ?? []) {

@@ -1,0 +1,4 @@
+
+# Imported conversation attachments - never commit
+.cloud-attachments/
+.local-archive/

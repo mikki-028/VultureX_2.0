@@ -1,3 +1,4 @@
+import { testPassword, adminCreds } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
@@ -6,7 +7,7 @@ const stamp = Date.now().toString(36);
 const S = `qa.e2e.deck.${stamp}@vulturex.test`;
 const I = `qa.e2e.deckinv.${stamp}@vulturex.test`;
 const O = `qa.e2e.deckother.${stamp}@vulturex.test`;
-const PASS = "qa-e2e-pass-123";
+const PASS = testPassword();
 const dbUrl = (fs.readFileSync(".env.local", "utf8").match(/^DATABASE_URL=(.*)$/m) || [])[1].trim();
 const db = postgres(dbUrl, { max: 1, prepare: false });
 
@@ -50,7 +51,7 @@ for (const [e, r] of [[S, "startup"], [I, "investor"], [O, "startup"]]) {
 const s = await login(S, PASS, "startup");
 const i = await login(I, PASS, "investor");
 const o = await login(O, PASS, "startup");
-const admin = await login("asmita.gupta008@gmail.com", "vulturex", "admin");
+const admin = await login(adminCreds().email, adminCreds().password, "admin");
 console.log("sessions:", { startup: s.ok, investor: i.ok, other: o.ok, admin: admin.ok });
 
 const mk = (name) => ({

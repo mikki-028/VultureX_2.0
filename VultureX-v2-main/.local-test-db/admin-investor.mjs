@@ -1,3 +1,4 @@
+import { databaseUrl } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
@@ -19,7 +20,7 @@ const admin = cookieHeader(".local-test-db/cookies/asmita.txt");
 const investor = cookieHeader(".local-test-db/cookies/investor.txt");
 const startup = cookieHeader(".local-test-db/cookies/startup.txt");
 
-const sql = postgres("postgres://postgres:postgres@127.0.0.1:55432/vulturex", { max: 1, prepare: false });
+const sql = postgres(databaseUrl(), { max: 1, prepare: false });
 const comp = (await sql`select id, status, title from competitions order by created_at limit 1`)[0];
 const startupRow = (await sql`select id, user_id from startups where slug='greenpath'`)[0];
 const investorRow = (await sql`select id from investors where full_name ilike '%Michael%' limit 1`)[0];

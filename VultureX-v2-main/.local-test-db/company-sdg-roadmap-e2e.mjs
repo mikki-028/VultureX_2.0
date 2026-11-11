@@ -1,3 +1,4 @@
+import { testPassword, adminCreds } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
@@ -5,7 +6,7 @@ const base = "http://127.0.0.1:3000";
 const stamp = Date.now().toString(36);
 const A = `qa.e2e.sdg.${stamp}@vulturex.test`;
 const B = `qa.e2e.sdgb.${stamp}@vulturex.test`;
-const PASS = "qa-e2e-pass-123";
+const PASS = testPassword();
 const dbUrl = (fs.readFileSync(".env.local", "utf8").match(/^DATABASE_URL=(.*)$/m) || [])[1].trim();
 const db = postgres(dbUrl, { max: 1, prepare: false });
 
@@ -48,7 +49,7 @@ for (const [e, r] of [[A, "startup"], [B, "startup"]]) {
 }
 const a = await login(A, PASS, "startup");
 const b = await login(B, PASS, "startup");
-const admin = await login("asmita.gupta008@gmail.com", "vulturex", "admin");
+const admin = await login(adminCreds().email, adminCreds().password, "admin");
 console.log("sessions:", { a: a.ok, b: b.ok, admin: admin.ok });
 
 const mk = (name) => ({

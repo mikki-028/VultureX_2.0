@@ -1,3 +1,4 @@
+import { testPassword, adminCreds } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
@@ -6,7 +7,7 @@ const stamp = Date.now().toString(36);
 const S1 = `qa.e2e.s1.${stamp}@vulturex.test`;
 const S2 = `qa.e2e.s2.${stamp}@vulturex.test`;
 const INV = `qa.e2e.inv.${stamp}@vulturex.test`;
-const PASS = "qa-e2e-pass-123";
+const PASS = testPassword();
 
 const dbUrl = (fs.readFileSync(".env.local", "utf8").match(/^DATABASE_URL=(.*)$/m) || [])[1].trim();
 const db = postgres(dbUrl, { max: 1, prepare: false, connect_timeout: 20 });
@@ -141,7 +142,7 @@ const claim = await req(a.j, "/api/impact", { method: "POST", body: { action: "s
 log("submit claim", claim);
 const claimId = claim.body?.claim?.id;
 if (claimId) {
-  const admin = await login("asmita.gupta008@gmail.com", "admin");
+  const admin = await login(adminCreds().email, adminCreds().password);
   console.log("admin session:", admin.hasSession);
   log("admin verify claim", await req(admin.j, `/api/admin/impact/${claimId}`, { method: "POST", body: { action: "verified" } }));
   const profile = await fetch(base + "/explore/" + p1.body.slug, { headers: { cookie: cookie(a.j) } });
@@ -154,7 +155,7 @@ const comp = await req(inv.j, "/api/competitions", { method: "POST", body: { tit
 log("create draft", comp);
 const compId = comp.body?.id;
 if (compId) {
-  const admin = await login("asmita.gupta008@gmail.com", "admin");
+  const admin = await login(adminCreds().email, adminCreds().password);
   log("admin approve draft", await req(admin.j, `/api/admin/competitions/${compId}`, { method: "PATCH", body: { action: "approve" } }));
   console.log("publish deliberately NOT executed (publication prohibited by test safety rules)");
 }

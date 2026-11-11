@@ -1,12 +1,13 @@
+import { localDatabaseUrl, testPassword } from "./config.mjs";
 import bcrypt from "bcryptjs";
 import postgres from "postgres";
 
-const sql = postgres("postgres://postgres:postgres@127.0.0.1:55432/vulturex_replay", {
+const sql = postgres(localDatabaseUrl(), {
   max: 1,
   prepare: false,
 });
 const email = "qa.admin.staging@vulturex.test";
-const passwordHash = await bcrypt.hash("qa-staging-admin-123", 12);
+const passwordHash = await bcrypt.hash(testPassword(), 12);
 await sql`
   insert into users (email, name, password_hash, role, email_verified)
   values (${email}, ${"QA Staging Admin"}, ${passwordHash}, ${"admin"}, true)

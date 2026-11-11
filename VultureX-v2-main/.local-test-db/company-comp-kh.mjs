@@ -1,10 +1,11 @@
+import { testPassword, adminCreds } from "./config.mjs";
 import fs from "node:fs";
 import postgres from "postgres";
 
 const base = "http://127.0.0.1:3000";
 const stamp = Date.now().toString(36);
 const EMAIL = (r) => `qa.e2e.${r}.${stamp}@vulturex.test`;
-const INV = EMAIL("inv"), A = EMAIL("a"), B = EMAIL("b"), PASS = "qa-e2e-pass-123";
+const INV = EMAIL("inv"), A = EMAIL("a"), B = EMAIL("b"), PASS = testPassword();
 const dbUrl = (fs.readFileSync(".env.local", "utf8").match(/^DATABASE_URL=(.*)$/m) || [])[1].trim();
 const db = postgres(dbUrl, { max: 1, prepare: false });
 
@@ -49,7 +50,7 @@ for (const [e, r] of [[INV, "investor"], [A, "startup"], [B, "startup"]]) {
 const inv = await login(INV, PASS, "investor");
 const a = await login(A, PASS, "startup");
 const b = await login(B, PASS, "startup");
-const admin = await login("asmita.gupta008@gmail.com", "vulturex", "admin");
+const admin = await login(adminCreds().email, adminCreds().password, "admin");
 console.log("sessions:", { inv: inv.ok, a: a.ok, b: b.ok, admin: admin.ok });
 
 log("investor onboarding", await req(inv.j, "/api/investors", { method: "POST", body: { fullName: "QA Comp Investor", investorType: "vc", firmName: "QA Comp VC", stageFocus: ["seed"], sectorFocus: ["climate"] } }));

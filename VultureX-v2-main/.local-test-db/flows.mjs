@@ -1,3 +1,4 @@
+import { testPassword } from "./config.mjs";
 import fs from "node:fs";
 
 const base = "http://127.0.0.1:3000";
@@ -45,19 +46,19 @@ console.log("========== AUTH / SIGNUP ==========");
 await call("signup missing fields", "/api/auth/signup", { method: "POST", body: { email: "x@y.z" } });
 await call("signup short password", "/api/auth/signup", {
   method: "POST",
-  body: { email: "qa-new@vulturex.test", password: "123", role: "startup" },
+  body: { email: "qa-new@vulturex.test", password: testPassword(), role: "startup" },
 });
 await call("signup admin role rejected", "/api/auth/signup", {
   method: "POST",
-  body: { email: "qa-admin2@vulturex.test", password: "qa-pass-123", role: "admin" },
+  body: { email: "qa-admin2@vulturex.test", password: testPassword(), role: "admin" },
 });
 const created = await call("signup valid startup", "/api/auth/signup", {
   method: "POST",
-  body: { email: "qa-new@vulturex.test", password: "qa-pass-123", name: "QA Founder", role: "startup" },
+  body: { email: "qa-new@vulturex.test", password: testPassword(), name: "QA Founder", role: "startup" },
 });
 await call("signup duplicate email", "/api/auth/signup", {
   method: "POST",
-  body: { email: "qa-new@vulturex.test", password: "qa-pass-123", role: "startup" },
+  body: { email: "qa-new@vulturex.test", password: testPassword(), role: "startup" },
 });
 
 console.log("\n========== ROADMAP ==========");
