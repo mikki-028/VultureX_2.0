@@ -32,6 +32,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useUnreadBadges } from "./use-unread-badges";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LiteModeToggle } from "./LiteModeToggle";
+import { Logo } from "./Logo";
 import { useLanguage } from "./LanguageProvider";
 
 type Role = "startup" | "investor" | "admin";
@@ -91,10 +92,11 @@ export function MobileNav({ role }: { role: Role }) {
       <div className="h-12 px-4 flex items-center justify-between">
         <Link
           href={role === "admin" ? "/admin" : "/dashboard"}
-          className="text-sm font-semibold"
+          className="flex min-w-0 items-center"
+          aria-label="VultureX"
           onClick={() => setOpen(false)}
         >
-          VultureX
+          <Logo size={20} textClassName="text-[13px]" priority />
         </Link>
         <div className="flex items-center gap-1.5">
           <ThemeToggle />

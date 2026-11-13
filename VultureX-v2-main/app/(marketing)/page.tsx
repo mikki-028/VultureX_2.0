@@ -11,6 +11,16 @@ import { SdgSection } from "./sdg-section";
 // Don't prerender at build time - DB is in a different region than build server
 export const dynamic = "force-dynamic";
 
+/**
+ * Requested company metric for the homepage investor statistic.
+ *
+ * The hero only prints a number when the verified investor records support it.
+ * Above this threshold the live count is shown (58 when there are 58 records,
+ * the real larger figure once there are more); below it the hero shows the
+ * honest "Growing Investor Network" label instead of a fabricated number.
+ */
+const VERIFIED_INVESTOR_METRIC = 58;
+
 export default async function HomePage() {
   // Run all queries in parallel
   const [startupCount, investorCount, connectionCount, topStartups] = await Promise.all([
@@ -20,10 +30,16 @@ export default async function HomePage() {
     db.select().from(startups).orderBy(desc(startups.score)).limit(6),
   ]);
 
+  const investorTotal = Number(investorCount.count);
+
   return (
     <div>
       <HeroSection
-        stats={{ startups: Number(startupCount.count), investors: Number(investorCount.count), connections: Number(connectionCount.count) }}
+        stats={{
+          startups: Number(startupCount.count),
+          investors: investorTotal >= VERIFIED_INVESTOR_METRIC ? investorTotal : null,
+          connections: Number(connectionCount.count),
+        }}
       />
       <FeatureGrid />
       <StartupTable startups={topStartups.map(s => ({

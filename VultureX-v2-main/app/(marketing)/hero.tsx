@@ -5,7 +5,9 @@ import { ArrowRight, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 
 type Props = {
-  stats: { startups: number; investors: number; connections: number };
+  /** `investors` is null when the verified records do not yet support the
+   *  requested company metric, in which case an honest label is shown. */
+  stats: { startups: number; investors: number | null; connections: number };
 };
 
 export function HeroSection({ stats }: Props) {
@@ -43,7 +45,9 @@ export function HeroSection({ stats }: Props) {
             className="mt-10 flex gap-8">
             {[
               { value: stats.startups, label: "Startups" },
-              { value: stats.investors, label: "Investors" },
+              stats.investors !== null
+                ? { value: stats.investors, label: "Investors" }
+                : { value: "Growing", label: "Investor Network" },
               { value: stats.connections, label: "Connections" },
             ].map((s, i) => (
               <motion.div key={s.label} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}

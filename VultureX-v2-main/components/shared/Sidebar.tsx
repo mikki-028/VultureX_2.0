@@ -11,6 +11,7 @@ import {
 import type { MessageKey } from "@/features/i18n/messages";
 import { NotificationBell } from "./NotificationBell";
 import { ThemeToggle } from "./ThemeToggle";
+import { Logo } from "./Logo";
 import { useUnreadBadges } from "./use-unread-badges";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import { LiteModeToggle } from "./LiteModeToggle";
@@ -56,8 +57,12 @@ export function Sidebar({ role }: { role: Role }) {
   return (
     <aside aria-label={t("nav.label")} className="hidden md:flex flex-col w-48 border-r border-[var(--border)] shrink-0 md:sticky md:top-0 md:h-screen md:overflow-hidden">
       <div className="px-3 h-12 flex items-center justify-between border-b border-[var(--border)]">
-        <Link href={role === "admin" ? "/admin" : "/dashboard"} className="text-sm font-semibold">
-          VultureX
+        <Link
+          href={role === "admin" ? "/admin" : "/dashboard"}
+          className="flex min-w-0 items-center"
+          aria-label="VultureX"
+        >
+          <Logo size={20} textClassName="text-[13px]" priority />
         </Link>
         <div className="flex items-center gap-1.5">
           <ThemeToggle />

@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 import { ThemeToggle } from "@/components/shared/ThemeToggle";
+import { Logo } from "@/components/shared/Logo";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
@@ -15,8 +16,8 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg)]/90 backdrop-blur-md border-b border-[var(--border)]">
       <div className="max-w-5xl mx-auto px-6">
         <div className="flex items-center justify-between h-12">
-          <Link href={isLoggedIn ? "/dashboard" : "/"} className="text-sm font-semibold">
-            VultureX
+          <Link href={isLoggedIn ? "/dashboard" : "/"} className="flex items-center" aria-label="VultureX">
+            <Logo size={22} priority />
           </Link>
 
           <nav role="navigation" aria-label="Main" className="hidden md:flex items-center gap-6">

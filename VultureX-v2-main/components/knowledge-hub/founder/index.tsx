@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import { NotificationBell } from "@/components/shared/NotificationBell";
+import { Logo } from "@/components/shared/Logo";
 import { translatorFor, type Locale, type MessageKey } from "@/features/i18n/messages";
 
 export type FounderAction = {
@@ -77,7 +78,7 @@ export function FounderTopBar({
   return (
     <div className="mb-5 flex items-center justify-between gap-3 border-b border-[var(--border)] pb-3">
       <div className="flex items-center gap-2">
-        <span className="text-xs font-semibold tracking-tight">VultureX</span>
+        <Logo size={16} textClassName="text-xs" />
         <span className="h-3 w-px bg-[var(--border)]" aria-hidden="true" />
         <span className="vx-label">{t("foryou.eyebrow")}</span>
       </div>
